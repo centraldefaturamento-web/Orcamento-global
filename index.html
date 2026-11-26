@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orçamento Global - Reajuste XML</title>
+<style>
+  *{box-sizing:border-box}
+  :root{ --prim:#2563EB; --prim-soft:#EFF6FF; --prim-border:#BFDBFE; }
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#F1F5F9;margin:0;color:#0F172A}
+  header{background:linear-gradient(135deg,#2563EB,#1E40AF);color:#fff;padding:22px 18px 28px}
+  .top{max-width:920px;margin:auto}
+  header h1{margin:0;font-size:24px}
+  header p{margin:6px 0 0;opacity:.9;font-size:13px}
+  .container{max-width:920px;margin:-14px auto 30px;padding:0 14px}
+  .steps{display:flex;gap:8px;margin-bottom:16px}
+  .step{flex:1;background:#fff;border-radius:12px;padding:10px;text-align:center;font-size:12px;font-weight:700;color:#94A3B8;border:2px solid #E2E8F0}
+  .step b{display:block;font-size:16px;color:#CBD5E1}
+  .step.active{border-color:#2563EB;color:#2563EB}
+  .step.active b{color:#2563EB}
+  .step.done{border-color:#22C55E;color:#16A34A}
+  .step.done b{color:#16A34A}
+  .card{background:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+  .tabs{display:flex;background:#E2E8F0;border-radius:12px;padding:4px}
+  .tabs button{flex:1;padding:12px;border:0;border-radius:9px;cursor:pointer;background:transparent;font-weight:800;color:#64748B;font-size:14px;transition:.2s}
+  .tabs button.active{background:#fff;color:#0F172A;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+  .info{margin-top:0;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5;background:#EFF6FF;border:1px solid #BFDBFE}
+  .drop{border:2px dashed #CBD5E1;border-radius:14px;padding:26px;text-align:center;color:#64748B;cursor:pointer;background:#F8FAFC;transition:.2s}
+  .drop:hover,.drop.over{border-color:#2563EB;background:#EFF6FF;color:#2563EB}
+  input[type=text]{width:100%;padding:14px;border:2px solid #CBD5E1;border-radius:12px;margin-top:6px;font-size:18px;font-weight:700;outline:none}
+  input[type=text]:focus{border-color:#2563EB}
+  .perc-wrap{position:relative}
+  .perc-wrap span{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:800;color:#94A3B8;font-size:18px}
+  label{font-weight:800;font-size:13px}
+  small{color:#64748B;font-size:12px}
+  .erro{color:#DC2626;font-size:12px;display:none;margin-top:6px;font-weight:700}
+  .btn-processar{background:#2563EB;color:#fff;border:0;padding:16px;border-radius:12px;font-weight:800;cursor:pointer;width:100%;margin-top:16px;font-size:16px;transition:.2s}
+  .btn-processar:hover{filter:brightness(.92)}
+  .btn-processar:disabled{background:#CBD5E1;cursor:not-allowed}
+  .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+  .stat{background:#F8FAFC;border-radius:12px;padding:14px;text-align:center;border:1px solid #E2E8F0}
+  .stat b{font-size:22px;display:block;color:#2563EB}
+  .stat span{font-size:12px;color:#64748B}
+  table{width:100%;border-collapse:collapse;font-size:13px} th{background:#F1F5F9;padding:10px;text-align:left} td{padding:9px 10px;border-bottom:1px solid #F1F5F9}
+  .pill{display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:800;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE}
+  @media(max-width:640px){.stats{grid-template-columns:1fr}}
+  .flash{animation:flash .4s}
+  @keyframes flash{0%{background:#FEF08A}100%{background:transparent}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>Orçamento Global</h1>
+    <p>Reajuste de XML TISS • Automático - Consulta e SADT • Nome e hash preservados</p>
+  </div>
+</header>
+<div class="container">
+  <div class="steps">
+    <div class="step active" id="step1"><b>1</b> Enviar XML</div>
+    <div class="step" id="step2"><b>2</b> Percentual</div>
+    <div class="step" id="step3"><b>3</b> Baixar</div>
+  </div>
+  <div class="tabs">
+    <button id="tabInd" class="active" onclick="setAba('ind')">📄 Individual</button>
+    <button id="tabLote" onclick="setAba('lote')">📁 Lote <span style="font-weight:400">• até 100</span></button>
+  </div>
+  <div class="card">
+    <div class="info">✅ <b>Automático</b> — não precisa escolher Consulta ou SADT. O site detecta sozinho pelo conteúdo do arquivo e aplica o reajuste certo. Pode misturar Consulta e SADT no mesmo lote que funciona.</div>
+  </div>
+  <div class="card">
+    <label>1 • Envie o arquivo XML</label>
+    <div class="drop" id="dropZone" onclick="document.getElementById('file').click()">
+      <strong id="dropText">📂 Clique ou arraste seu XML aqui</strong><br><small>Também pode soltar o arquivo direto nessa caixa</small>
+    </div>
+    <input type="file" id="file" accept=".xml" multiple style="display:none">
+    <div id="nomeArquivo" style="font-size:12px;margin-top:8px;white-space:pre-line"></div>
+  </div>
+  <div class="card">
+    <label>2 • Qual o percentual?</label>
+    <div style="margin-top:8px">
+      <div class="perc-wrap">
+        <input type="text" id="perc" placeholder="Ex: 11,5" inputmode="decimal" autocomplete="off"><span>%</span>
+      </div>
+      <small>Aceita vírgula ou ponto • Ex: <b>11,5</b> • <b>1,25</b> • Somente aumento, sem negativo</small>
+      <div class="erro" id="erroPerc">⚠ Digite o percentual antes de processar</div>
+      <small style="margin-top:8px">✓ O arquivo baixado vai sair com <b>exatamente o mesmo nome</b> do original, sem acrescentar nada. O <b>hash não será alterado</b>.</small>
+    </div>
+    <button class="btn-processar" id="btnProcessar" onclick="processar()">Aplicar e Baixar XML →</button>
+  </div>
+  <div class="card" id="previaCard" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center"><b>👁 Prévia — o que vai mudar</b><span class="pill" id="pillModo">AUTOMÁTICO</span></div>
+    <span style="font-size:12px;color:#64748B" id="previaSub"></span>
+    <div class="stats">
+      <div class="stat"><b id="totalElem">0</b><span>elementos</span></div>
+      <div class="stat"><b id="totalPerc">-</b><span>percentual</span></div>
+      <div class="stat"><b id="totalDif">R$ 0,00</b><span>diferença total</span></div>
+    </div>
+    <div style="max-height:320px;overflow:auto">
+      <table><thead><tr><th>Elemento</th><th>Original</th><th>Novo</th><th>Linha</th></tr></thead><tbody id="tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+<script>
+let abaAtual='ind', arquivos=[];
+function setAba(aba){ abaAtual=aba; document.getElementById('tabInd').className=aba==='ind'?'active':''; document.getElementById('tabLote').className=aba==='lote'?'active':''; document.getElementById('file').multiple=aba==='lote'; document.getElementById('nomeArquivo').innerText=''; arquivos=[]; updateSteps(); }
+function updateSteps(){
+  const temArq = arquivos.length>0;
+  const temPerc = getPerc()!==null && !isNaN(getPerc());
+  document.getElementById('step1').className = 'step ' + (temArq ? 'done' : 'active');
+  document.getElementById('step2').className = 'step ' + (temPerc ? 'done' : (temArq ? 'active' : ''));
+  document.getElementById('step3').className = 'step ' + ((temArq && temPerc) ? 'active' : '');
+  document.getElementById('btnProcessar').disabled = !(temArq && temPerc);
+  document.getElementById('btnProcessar').innerText = !(temArq && temPerc) ? 'Preencha os passos acima para liberar o download' : 'Aplicar e Baixar XML →';
+}
+const drop = document.getElementById('dropZone');
+['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('over'); document.getElementById('dropText').innerText='Solte aqui! 👇'; }));
+['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('over'); document.getElementById('dropText').innerText='📂 Clique ou arraste seu XML aqui'; }));
+drop.addEventListener('drop', e=>{ const files=[...e.dataTransfer.files].filter(f=>f.name.toLowerCase().endsWith('.xml')); if(files.length){ arquivos=files; document.getElementById('nomeArquivo').innerText=arquivos.map(f=>f.name+' - '+(f.size/1024).toFixed(1)+' KB').join('\n'); gerarPrevia(); updateSteps(); } });
+document.getElementById('file').addEventListener('change',e=>{ arquivos=[...e.target.files]; document.getElementById('nomeArquivo').innerText=arquivos.map(f=>f.name+' - '+(f.size/1024).toFixed(1)+' KB').join('\n'); if(arquivos.length>0) gerarPrevia(); updateSteps(); });
+function formatar(v){ return 'R$ '+v.toFixed(2).replace('.',','); }
+function calc(v,perc){ return parseFloat((v * (1 + perc/100)).toFixed(10)); }
+
+// AUTOMÁTICO: junta todas as tags. Consulta só tem valorProcedimento, SADT só tem as outras.
+// Se o arquivo for Consulta, só acha valorProcedimento. Se for SADT, só acha as do SADT.
+// Se vier misturado no lote, corrige os dois.
+function tagsDoModo(){
+  return ['valorProcedimento','valorUnitario','valorTotal','valorProcedimentos','valorDiarias','valorTaxasAlugueis','valorMateriais','valorMedicamentos','valorOPME','valorGasesMedicinais','valorTotalGeral'];
+}
+function getPerc(){
+  let raw=document.getElementById('perc').value.trim();
+  if(!raw) return null;
+  raw=raw.replace('%','').trim().replace(',','.');
+  if(!/^\d+(\.\d+)?$/.test(raw)) return NaN;
+  const n=parseFloat(raw);
+  if(n < 0) return NaN;
+  return n;
+}
+function formatarComoOriginal(valorOriginalStr, valorNovoNum){
+  let casas = 2;
+  if(valorOriginalStr.includes('.')){ casas = valorOriginalStr.split('.')[1].length; }
+  else { casas = 0; }
+  return valorNovoNum.toFixed(casas);
+}
+function detectarTipo(texto){
+  const temConsulta = texto.includes('guiaConsulta');
+  const temSadt = texto.includes('guiaSP-SADT') || texto.includes('guiaSADT');
+  if(temConsulta && temSadt) return 'CONSULTA + SADT';
+  if(temSadt) return 'SADT';
+  if(temConsulta) return 'CONSULTA';
+  return 'AUTOMÁTICO';
+}
+async function gerarPrevia(){
+  const perc=getPerc();
+  if(perc===null||isNaN(perc)){ document.getElementById('previaCard').style.display='none'; updateSteps(); return; }
+  const texto=await arquivos[0].text(); const linhas=texto.split('\n'); const tags=tagsDoModo(); let tbody='',dif=0,count=0;
+  linhas.forEach((linha,idx)=>{ tags.forEach(tag=>{ const re=new RegExp(`<ans:${tag}>([\\d.,]+)<\\/ans:${tag}>`,'g'); let m; while((m=re.exec(linha))!==null){ const originalStr=m[1]; const original=parseFloat(originalStr); const novo=calc(original,perc); const novoFormatado=formatarComoOriginal(originalStr,novo); tbody+=`<tr><td><b>ans:${tag}</b></td><td>${formatar(original)}</td><td><b>→ ${formatar(parseFloat(novoFormatado))}</b></td><td>#${idx+1}</td></tr>`; dif+=(parseFloat(novoFormatado)-original); count++; } }); });
+  document.getElementById('tbody').innerHTML=tbody;
+  document.getElementById('totalElem').innerText=count;
+  document.getElementById('totalPerc').innerText='+'+String(perc).replace('.',',')+'%';
+  document.getElementById('totalDif').innerText=formatar(dif);
+  document.getElementById('pillModo').innerText = detectarTipo(texto);
+  document.getElementById('previaSub').innerText=`Arquivo ${arquivos[0].name} • Tipo detectado: ${detectarTipo(texto)} • ${count} elementos encontrados`;
+  document.getElementById('previaCard').style.display='block';
+  const card=document.getElementById('previaCard'); card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
+  updateSteps();
+}
+document.getElementById('perc').addEventListener('input',()=>{ document.getElementById('erroPerc').style.display='none'; if(arquivos.length) gerarPrevia(); else updateSteps(); });
+function aplicarEmTexto(texto,perc){
+  const tags=tagsDoModo();
+  tags.forEach(tag=>{
+    const re=new RegExp(`(<ans:${tag}>)([\\d.,]+)(</ans:${tag}>)`,'g');
+    texto=texto.replace(re,(match,abre,valor,fecha)=>{
+      const novo=calc(parseFloat(valor),perc);
+      const novoFormatado=formatarComoOriginal(valor,novo);
+      return abre+novoFormatado+fecha;
+    });
+  });
+  return texto;
+}
+async function processar(){
+  const perc=getPerc();
+  if(perc===null||isNaN(perc)){
+    document.getElementById('erroPerc').style.display='block';
+    document.getElementById('erroPerc').innerText = perc===null ? '⚠ Digite o percentual antes de processar' : '⚠ Use só número positivo, ex: 11,5';
+    document.getElementById('perc').focus(); return;
+  }
+  if(arquivos.length===0){ alert('Selecione um arquivo primeiro'); return; }
+  if(abaAtual==='lote'&&arquivos.length>100){ alert('Máximo 100 arquivos no lote'); return; }
+  if(abaAtual==='ind'){
+    const texto=await arquivos[0].text();
+    const novo=aplicarEmTexto(texto,perc);
+    baixar(novo, arquivos[0].name);
+  } else {
+    if(!window.JSZip){ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; document.head.appendChild(s); await new Promise(r=>s.onload=r); }
+    const zip=new JSZip();
+    for(let f of arquivos){ const texto=await f.text(); zip.file(f.name, aplicarEmTexto(texto,perc)); }
+    const blob=await zip.generateAsync({type:'blob'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='xmls_reajustados.zip'; a.click();
+  }
+  document.getElementById('step3').className='step done';
+}
+function baixar(conteudo,nome){ const blob=new Blob([conteudo],{type:'application/xml'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nome; a.click(); }
+updateSteps();
+</script>
+</body>
+</html>
