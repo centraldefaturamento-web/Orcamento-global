@@ -67,7 +67,7 @@
     <button id="tabLote" onclick="setAba('lote')">📁 Lote <span style="font-weight:400">• até 500</span></button>
   </div>
   <div class="card">
-    <div class="info">✅ <b>Automático</b> — não precisa escolher Consulta ou SADT. O site detecta sozinho pelo conteúdo do arquivo e aplica o reajuste certo. Pode misturar Consulta e SADT no mesmo lote que funciona.</div>
+    <div class="info">✅ <b>Automático</b> — não precisa escolher Consulta ou SADT. O site detecta sozinho e aplica o reajuste certo. Pode mandar Consulta e SADT juntos no mesmo lote que funciona.</div>
   </div>
   <div class="card">
     <label>1 • Envie o arquivo XML</label>
@@ -83,9 +83,9 @@
       <div class="perc-wrap">
         <input type="text" id="perc" placeholder="Ex: 11,5" inputmode="decimal" autocomplete="off"><span>%</span>
       </div>
-      <small>Aceita vírgula ou ponto • Ex: <b>11,5</b> • <b>1,25</b> • Somente aumento, sem negativo</small>
+      <small>Aceita vírgula ou ponto • Ex: <b>11,5</b> • <b>1,25</b></small>
       <div class="erro" id="erroPerc">⚠ Digite o percentual antes de processar</div>
-      <small style="margin-top:8px">✓ O arquivo baixado vai sair com <b>exatamente o mesmo nome</b> do original, sem acrescentar nada. O <b>hash não será alterado</b>.</small>
+      <small style="margin-top:8px">✓ O arquivo baixado vai sair com <b>exatamente o mesmo nome</b> do original.</small>
     </div>
     <button class="btn-processar" id="btnProcessar" onclick="processar()">Aplicar e Baixar XML →</button>
   </div>
