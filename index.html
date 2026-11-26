@@ -63,7 +63,7 @@
   </div>
   <div class="tabs">
     <button id="tabInd" class="active" onclick="setAba('ind')">📄 Individual</button>
-    <button id="tabLote" onclick="setAba('lote')">📁 Lote <span style="font-weight:400">• até 100</span></button>
+    <button id="tabLote" onclick="setAba('lote')">📁 Lote <span style="font-weight:400">• até 500</span></button>
   </div>
   <div class="card">
     <div class="info">✅ <b>Automático</b> — não precisa escolher Consulta ou SADT. O site detecta sozinho pelo conteúdo do arquivo e aplica o reajuste certo. Pode misturar Consulta e SADT no mesmo lote que funciona.</div>
@@ -120,10 +120,6 @@ drop.addEventListener('drop', e=>{ const files=[...e.dataTransfer.files].filter(
 document.getElementById('file').addEventListener('change',e=>{ arquivos=[...e.target.files]; document.getElementById('nomeArquivo').innerText=arquivos.map(f=>f.name+' - '+(f.size/1024).toFixed(1)+' KB').join('\n'); if(arquivos.length>0) gerarPrevia(); updateSteps(); });
 function formatar(v){ return 'R$ '+v.toFixed(2).replace('.',','); }
 function calc(v,perc){ return parseFloat((v * (1 + perc/100)).toFixed(10)); }
-
-// AUTOMÁTICO: junta todas as tags. Consulta só tem valorProcedimento, SADT só tem as outras.
-// Se o arquivo for Consulta, só acha valorProcedimento. Se for SADT, só acha as do SADT.
-// Se vier misturado no lote, corrige os dois.
 function tagsDoModo(){
   return ['valorProcedimento','valorUnitario','valorTotal','valorProcedimentos','valorDiarias','valorTaxasAlugueis','valorMateriais','valorMedicamentos','valorOPME','valorGasesMedicinais','valorTotalGeral'];
 }
@@ -186,7 +182,7 @@ async function processar(){
     document.getElementById('perc').focus(); return;
   }
   if(arquivos.length===0){ alert('Selecione um arquivo primeiro'); return; }
-  if(abaAtual==='lote'&&arquivos.length>100){ alert('Máximo 100 arquivos no lote'); return; }
+  if(abaAtual==='lote'&&arquivos.length>500){ alert('Máximo 500 arquivos no lote'); return; }
   if(abaAtual==='ind'){
     const texto=await arquivos[0].text();
     const novo=aplicarEmTexto(texto,perc);
