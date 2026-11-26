@@ -202,6 +202,29 @@ async function processar(){
 }
 function baixar(conteudo,nome){ const blob=new Blob([conteudo],{type:'application/xml'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nome; a.click(); }
 updateSteps();
+</script><!-- TRAVA DE SENHA -->
+<div id="tela-senha" style="position:fixed;inset:0;background:#0f172a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:sans-serif;color:white;padding:20px;text-align:center">
+  <h2 style="margin:0 0 10px">Orçamento Global</h2>
+  <p style="opacity:.7;margin:0 0 20px">Área restrita - Central de Faturamento</p>
+  <input id="input-senha" type="password" placeholder="Digite a senha" style="padding:12px 14px;border-radius:8px;border:0;width:260px;max-width:90%;font-size:16px;text-align:center">
+  <button onclick="checarSenha()" style="margin-top:12px;padding:12px 20px;border:0;border-radius:8px;background:#22c55e;color:white;font-weight:bold;font-size:16px;cursor:pointer;width:260px;max-width:90%">Entrar</button>
+  <p id="erro-senha" style="color:#f87171;display:none;margin-top:12px">Senha incorreta</p>
+</div>
+
+<script>
+function checarSenha(){
+  var s = document.getElementById('input-senha').value;
+  if(s === 'xml0123456'){
+    document.getElementById('tela-senha').style.display = 'none';
+    sessionStorage.setItem('liberado','sim');
+  } else {
+    document.getElementById('erro-senha').style.display = 'block';
+  }
+}
+if(sessionStorage.getItem('liberado') === 'sim'){
+  document.getElementById('tela-senha').style.display = 'none';
+}
+document.getElementById('input-senha').addEventListener('keydown', function(e){ if(e.key === 'Enter') checarSenha(); });
 </script>
 </body>
 </html>
